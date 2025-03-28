@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Push Your Luck Solitary</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bree+Serif&family=Pixelify+Sans:wght@400..700&family=Tiny5&display=swap');
+
+        .pixelify-sans {
+            font-family: "Pixelify Sans", serif;
+            font-optical-sizing: auto;
+            font-weight: 500;
+            font-style: normal;
+        }
+
+        .tiny5-regular {
+            font-family: "Tiny5", serif;
+            font-weight: 480;
+            font-style: normal;
+        }
+
+        .bree-serif-regular {
+            font-family: "Bree Serif", serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        .txtprinc {
+            color: #ffffff;
+            text-shadow: 0 0 20px rgba(235, 234, 234, 0.836);
+            ;
+        }
+
+        #carta_actual {
+            width: 200px;
+            height: 320px;
+            border: 1px solid black;
+            margin: 20px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            background: #ffffff;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        .btn-estilo {
+            background-color: rgb(26, 180, 20);
+            border-radius: 15px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 0 15px rgb(26, 180, 20);
+        }
+
+        .btn-estilo:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 20px rgb(255, 255, 255);
+        }
+    </style>
+</head>
+
+<body class="bg-dark">
+    <div class="container-fluid text-center mt-2">
+        <h1 class="pixelify-sans txtprinc" style="font-weight: 700; font-size: 50px;">PUSH YOUR LUCK SOLITARY</h1>
+    </div>
+
+    <div class="row pt-4">
+        <div class="col-md-3 text-center">
+            <p class="pixelify-sans txtprinc" style="font-weight: 700; font-size: 50px;"><img src="iconos/digital.png"
+                    alt="contador">VIDAS</p>
+            <span id="vidas" class="pixelify-sans txtprinc" style="font-size: 50px;">3</span>
+        </div>
+        <div class="col-md-6 text-center">
+            <span class="pixelify-sans txtprinc" style="font-weight: 700; font-size: 50px;">CARTA ACTUAL</span>
+            <div id="carta_actual" class="bree-serif-regular fs-2 "></div>
+        </div>
+        <div class="col-md-3 text-center">
+            <p class="pixelify-sans txtprinc" style="font-weight: 700; font-size: 50px;"><img
+                    src="iconos/calculadora.png" alt="contador" style="height: 40px;" class="me-2">CONTADOR</p>
+            <span id="contador" class="pixelify-sans txtprinc" style="font-size: 50px;"></span>
+        </div>
+    </div>
+
+
+    <div class="row pt-3">
+        <div class="col-md-12 text-center">
+            <button id="btnAlta" class="btn btn-lg pixelify-sans btn-estilo mx-2">ALTA ( <span id="numAlta"
+                    class="tiny5-regular"></span> )</button>
+            <button id="btnBaja" class="btn btn-lg pixelify-sans btn-estilo mx-2">BAJA ( <span id="numBaja"
+                    class="tiny5-regular"></span> )</button>
+            <button id="btnMismoColor" class="btn btn-lg pixelify-sans btn-estilo mx-2">MISMO COLOR ( <span
+                    id="num_mismo_color" class="tiny5-regular"></span> )</button>
+            <button id="btnDistintoColor" class="btn btn-lg pixelify-sans btn-estilo mx-2">DISTINTO COLOR ( <span
+                    id="num_dist_color" class="tiny5-regular"></span> )</button>
+            <button id="btnSumaMenor" class="btn btn-lg pixelify-sans btn-estilo mx-2">SUMA < 11 ( <span
+                    id="suma_menor"></span> )</button>
+            <button id="btnComodin" class="btn btn-lg pixelify-sans btn-estilo mx-2">COMODÍN ( <span
+                    id="num_comodin"></span> )</button>
+        </div>
+    </div>
+    <div class="container container-fluid text-center pt-5">
+        <button id="btnPlantarse" class="btn btn-lg pixelify-sans btn-estilo mx-2">PLANTARSE</button>
+    </div>
+
+
+
+    <script>
+        // PALOS Y NUMEROS
+        const paloRojo1 = '♥️';
+        const paloRojo2 = '♦️';
+        const paloNegro1 = '♠️';
+        const paloNegro2 = '♣️';
+
+        const numeros = {
+            A: 1,
+            '2': 2,
+            '3': 3,
+            '4': 4,
+            '5': 5,
+            '6': 6,
+            '7': 7,
+            '8': 8,
+            '9': 9,
+            '10': 10,
+            J: 10,
+            Q: 10,
+            K: 10
+        };
+
+        // VARIABLES CLAVES 
+        let num_vidas = 3;
+        let contador = 0;
+        let carta_actual = cartasAleatorias();
+        let botones = {
+            cont_alta: 15,
+            cont_baja: 15,
+            cont_mismo_color: 5,
+            cont_distinto_color: 5,
+            cont_suma: 10,
+            cont_comodin: 3
+        };
+
+        // GENERAR UNA CARTA ALEATORIA
+        function cartasAleatorias() {
+            const palo = Math.random() < 0.5 ? (Math.random() < 0.5 ? paloRojo1 : paloRojo2) : (Math.random() < 0.5 ? paloNegro1 : paloNegro2);
+            const num = Object.keys(numeros)[Math.floor(Math.random() * Object.keys(numeros).length)];
+            const mostrarCarta = `${palo} ${num}`;
+            document.getElementById("carta_actual").innerHTML = mostrarCarta;
+
+            return { palo, num, valor: numeros[num] };
+        }
+
+        // CARTA INICIO
+        document.addEventListener("DOMContentLoaded", cartasAleatorias);
+
+        // PLANTARSE
+        const plantarse = document.getElementById("btnPlantarse");
+        plantarse.addEventListener('click', () => {
+            alert('Fin del Juego. Tu número de cartas levantadas ha sido: ' + contador);
+            const botones = document.querySelectorAll('button');
+            botones.forEach(boton => {
+                boton.disabled = true;
+            });
+        });
+
+        // CONTADOR Y VIDAS
+        const mostrar_vidas = document.getElementById("vidas");
+        const mostrar_contador = document.getElementById("contador");
+        mostrar_vidas.innerHTML = `${num_vidas}`;
+        mostrar_contador.innerHTML = `${contador}`;
+
+        // ALTA
+        const btnAlta = document.getElementById("btnAlta");
+        const num_alta = document.getElementById("numAlta");
+
+        num_alta.innerHTML = `${botones.cont_alta}`;
+
+
+        btnAlta.addEventListener('click', () => {
+
+            if (botones.cont_alta > 0) {
+                const carta_nueva = cartasAleatorias();
+                const acierto = carta_nueva.valor > carta_actual.valor;
+
+                if (acierto) {
+                    alert('¡Enhorabuena de la buena!');
+                    contador++;
+                } else {
+                    alert('Fallaste.');
+                    num_vidas--;
+
+                }
+
+                botones.cont_alta--;
+
+                num_alta.innerHTML = `${botones.cont_alta}`;
+                mostrar_vidas.innerHTML = `${num_vidas}`;
+                mostrar_contador.innerHTML = `${contador}`;
+
+                carta_actual = carta_nueva;
+                if (num_vidas === 0) {
+                    alert('¡Has perdido! No te quedan vidas.');
+                    const botones = document.querySelectorAll('button');
+                    botones.forEach(boton => {
+                        boton.disabled = true;
+                    });
+                }
+            } else {
+                alert('Ya no puedes usar el boton "Alta".');
+                btnAlta.disabled = true;
+            }
+
+        });
+
+        // BAJA 
+        const btnBaja = document.getElementById("btnBaja");
+        const num_baja = document.getElementById("numBaja");
+
+        num_baja.innerHTML = `${botones.cont_baja}`;
+
+        btnBaja.addEventListener('click', () => {
+
+            if (botones.cont_baja > 0) {
+                const carta_nueva = cartasAleatorias();
+                const acierto = carta_nueva.valor < carta_actual.valor;
+
+                if (acierto) {
+                    alert('¡Enhorabuena de la buena!');
+                    contador++;
+                } else {
+                    alert('Fallaste.');
+                    num_vidas--;
+                }
+
+                botones.cont_baja--;
+
+                num_baja.innerHTML = `${botones.cont_baja}`;
+                mostrar_vidas.innerHTML = `${num_vidas}`;
+                mostrar_contador.innerHTML = `${contador}`;
+
+                carta_actual = carta_nueva;
+                if (num_vidas === 0) {
+                    alert('¡Has perdido! No te quedan vidas.');
+                    const botones = document.querySelectorAll('button');
+                    botones.forEach(boton => {
+                        boton.disabled = true;
+                    });
+                }
+            } else {
+                alert('Ya no puedes usar el botón "Baja".');
+                btnBaja.disabled = true;
+            }
+
+        });
+
+        // MISMO COLOR 
+
+        const btnMismoColor = document.getElementById("btnMismoColor");
+        const num_MismoColor = document.getElementById("num_mismo_color");
+
+        num_MismoColor.innerHTML = `${botones.cont_mismo_color}`;
+
+
+        btnMismoColor.addEventListener('click', () => {
+            if (botones.cont_mismo_color > 0) {
+                const carta_nueva = cartasAleatorias();
+
+                // Comparar manualmente los colores
+                const color_cartaActual = (carta_actual.palo === paloRojo1 || carta_actual.palo === paloRojo2);
+                const Color_cartaNueva = (carta_nueva.palo === paloRojo1 || carta_nueva.palo === paloRojo2);
+                const mismoColor = color_cartaActual == Color_cartaNueva;
+
+
+                if (mismoColor) {
+                    alert('¡Enhorabuena de la buena! La carta es del mismo color');
+                    contador++;
+                } else {
+                    alert('Fallaste. La carta es de distinto color');
+                    num_vidas--;
+                }
+
+                botones.cont_mismo_color--;
+                num_mismo_color.innerHTML = `${botones.cont_mismo_color}`;
+                mostrar_vidas.innerHTML = `${num_vidas}`;
+                mostrar_contador.innerHTML = `${contador}`;
+                carta_actual = carta_nueva;
+                if (num_vidas === 0) {
+                    alert('¡Has perdido! No te quedan vidas.');
+                    const botones = document.querySelectorAll('button');
+                    botones.forEach(boton => {
+                        boton.disabled = true;
+                    });
+                }
+            } else {
+                alert('Ya no puedes usar el botón "Mismo Color".');
+                btnMismoColor.disabled = true;
+            }
+        });
+
+
+        // DISTINT0 COLOR 
+
+        const btnDistintoColor = document.getElementById("btnDistintoColor");
+        const num_DistintoColor = document.getElementById("num_dist_color");
+
+        num_DistintoColor.innerHTML = `${botones.cont_distinto_color}`;
+
+        btnDistintoColor.addEventListener('click', () => {
+            if (botones.cont_distinto_color > 0) {
+                const carta_nueva = cartasAleatorias();
+
+                const color_cartaActual = (carta_actual.palo === paloRojo1 || carta_actual.palo === paloRojo2);
+                const Color_cartaNueva = (carta_nueva.palo === paloRojo1 || carta_nueva.palo === paloRojo2);
+                const distintoColor = color_cartaActual !== Color_cartaNueva;
+
+                if (distintoColor) {
+                    alert('¡Enhorabuena de la Buena! La carta es de distinto color.');
+                    contador++;
+                } else {
+                    alert('Has Fallado. La carta no es de distinto color.');
+                    num_vidas--;
+                }
+
+                botones.cont_distinto_color--;
+                num_DistintoColor.innerHTML = `${botones.cont_distinto_color}`;
+                mostrar_vidas.innerHTML = `${num_vidas}`;
+                mostrar_contador.innerHTML = `${contador}`;
+
+                carta_actual = carta_nueva;
+                if (num_vidas === 0) {
+                    alert('¡Has perdido! No te quedan vidas.');
+                    const botones = document.querySelectorAll('button');
+                    botones.forEach(boton => {
+                        boton.disabled = true;
+                    });
+                }
+            } else {
+                alert('Ya no puedes usar el botón "Distinto Color".');
+                btnDistintoColor.disabled = true;
+            }
+        });
+
+        // SUMA < 11
+
+        const btnSumaMenor = document.getElementById("btnSumaMenor");
+        const num_SumaMenor11 = document.getElementById("suma_menor");
+
+        num_SumaMenor11.innerHTML = `${botones.cont_suma}`;
+
+        btnSumaMenor.addEventListener('click', () => {
+            if (botones.cont_suma > 0) {
+
+                const carta_nueva = cartasAleatorias();
+                const suma = carta_actual.valor + carta_nueva.valor;
+
+                if (suma < 11) {
+                    alert('¡Enhorabuena de la Buena! La suma es menor a 11.');
+                    contador++;
+                } else {
+                    alert('Fallaste. La suma es 11 o mayor.');
+                    num_vidas--;
+                }
+
+                botones.cont_suma--;
+
+                num_SumaMenor11.innerHTML = `${botones.cont_suma}`;
+                mostrar_vidas.innerHTML = `${num_vidas}`;
+                mostrar_contador.innerHTML = `${contador}`;
+                carta_actual = carta_nueva;
+                if (num_vidas === 0) {
+                    alert('¡Has perdido! No te quedan vidas.');
+                    const botones = document.querySelectorAll('button');
+                    botones.forEach(boton => {
+                        boton.disabled = true;
+                    });
+                }
+
+            } else {
+                alert('Ya no puedes usar el botón "Suma < 11".');
+                btnSumaMenor.disabled = true;
+            }
+        });
+
+        // COMODÍN 
+
+        const btnComodin = document.getElementById("btnComodin");
+        const num_comodin = document.getElementById("num_comodin");
+
+        num_comodin.innerHTML = `${botones.cont_comodin}`;
+
+        btnComodin.addEventListener('click', () => {
+            if (botones.cont_comodin > 0) {
+                alert('¡Enhorabuena de la Buena! Has usado el Comodín.');
+                contador++;
+                botones.cont_comodin--;
+                num_comodin.innerHTML = `${botones.cont_comodin}`;
+                mostrar_contador.innerHTML = `${contador}`;
+            } else {
+                alert('Ya no puedes usar el botón "Comodín".');
+                btnComodin.disabled = true;
+            }
+        });
+
+
+
+
+
+
+
+
+    </script>
+
+</body>
+
+</html>
