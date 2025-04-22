@@ -85,3 +85,55 @@ for (let i = 0; i < Num.length; i++){
 }
 
 console.log("El mayor es " + mayor);
+
+
+//funciones menor que 4 y menor que 16 
+
+function menor2(a,b) {
+    if (a < b) return a;
+    else return b;
+}
+
+console.log(menor2(3,5));
+
+function menor4(a,b,c,d) {
+
+    let m1 = menor2(a,b);
+    let m2 = menor2(c,d);
+
+    return menor2(m1,m2);    
+
+    // return menor2(menor2(a,b),menor2(c,d));
+}
+
+console.log(menor4(1,-5,7,9));
+
+function menor16(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p){
+    let m1 = menor4(a,b,c,d);
+    let m2 = menor4(e,f,g,h);
+    let m3 = menor4(i,j,k,l);
+    let m4 = menor4(m,n,o,p);
+
+    return menor4(m1,m2,m3,m4);
+
+}
+
+console.log(menor16(1,-100,7,9,10,11,12,13,14,15,16,17,18,19,20,21));
+
+
+/*menor que 15*/
+
+function menor3 (a,b,c) {
+    let r1 = menor2(a,b);
+    return menor2(r1,c);
+}
+
+function menor15(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o){
+    let m1 = menor4(a,b,c,d);
+    let m2 = menor4(e,f,g,h);
+    let m3 = menor4(i,j,k,l);
+    let m4 = menor4(m3,m,n,o);
+
+    return menor4(m1,m2,m3,m4);   
+}
+console.log(menor15(1,2,3,4,5,6,7,8,-99,10,11,12,13,14,15));
