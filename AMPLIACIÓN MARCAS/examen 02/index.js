@@ -137,3 +137,57 @@ function menor15(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o){
     return menor4(m1,m2,m3,m4);   
 }
 console.log(menor15(1,2,3,4,5,6,7,8,-99,10,11,12,13,14,15));
+
+
+/*EJRCICIO 6 matriz 3x3*/
+
+let matriz = [ [1,2,3],
+               [3,3,7],
+               [4,3,9]
+            ];
+
+console.log(matriz[1]);
+
+console.log(matriz[1][2]);
+
+
+/*EJERCICIO 7*/
+
+let alumno = {
+
+    nombre: "Begoña",
+    nLista: 13,
+    asignatura: "ISO",
+    notas: [5, 6, 7, 8],
+}
+console.log(alumno);
+
+/*EJERCICIO 8 Funcion dado de 10 caras*/
+
+function dado() {
+    return Math.floor(Math.random() * 10) + 1;
+}
+
+console.log(dado());
+
+
+/*EJERCICIO 9*/
+function iniciar() {
+    const miBotonX = document.getElementById("miBoton");
+
+
+miBotonX.addEventListener("click", () => {
+    
+    let parra= document.getElementById("miParrafo");
+
+    parra.style.color = "green";
+
+});
+}
+
+
+
+
+
+
+
