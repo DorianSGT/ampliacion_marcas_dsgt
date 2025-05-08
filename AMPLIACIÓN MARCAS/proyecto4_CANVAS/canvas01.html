@@ -17,6 +17,7 @@
     
 </head>
 <body>
+    
     <canvas id="gameCanvas" width="800" height="400"></canvas>
     
 
@@ -28,15 +29,98 @@
             x: 50,
             y: 150,
             w: 30,
-            h: 60
+            h: 60,
+            paso: 5
         };
+
+        const diana = {
+            x:700,
+            y: 150,
+            w: 50,
+            h: 50,
+            imagen: new Image()
+        };
+
+        
+        let existe_bala = false;
+        
+
+        diana.imagen.src = 'img/diana.png';
 
         function pintarJugador() {
             ctx.fillStyle = 'red';
             ctx.fillRect(p1.x,p1.y,p1.w,p1.h);
 
+            
+
         }
-        pintarJugador();    
+
+        function pintarDiana() {
+            
+            ctx.drawImage(diana.imagen, diana.x, diana.y, diana.w, diana.h);
+
+        }
+
+        function pintarBala() {
+            
+            if (existe_bala) {
+
+            bala.x = bala.x + bala.velocidad;
+            //Circulo
+            ctx.fillStyle = 'black';
+            ctx.beginPath();
+            ctx.arc(bala.x, bala.y, 6, 0, 2 * Math.PI);
+            ctx.fill();
+                
+
+            }
+            
+            
+        }
+
+        //diana.imagen.onload = function (){ pintarDiana() };
+
+        document.addEventListener( 'keydown', (e) => {
+
+
+            if (e.key === 'ArrowUp') {
+
+                p1.y = p1.y - p1.paso;
+            }
+            else if (e.key === 'ArrowDown') {
+
+                p1.y = p1.y + p1.paso;
+            }
+            else if (e.code === 'Space') {
+
+                if (!existe_bala) {
+
+                    existe_bala = true;
+                    bala = {
+                        x: p1.x + p1.w,
+                        y: p1.y,
+                        velocidad: 7
+                    }
+                }        
+            }
+        }
+
+        );
+
+        function bucleJuego() {
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            pintarJugador(); 
+            pintarDiana();
+            pintarBala();
+            
+            requestAnimationFrame(bucleJuego);
+        }
+
+        bucleJuego();
+
+
     </script>
 </body>
 </html>
