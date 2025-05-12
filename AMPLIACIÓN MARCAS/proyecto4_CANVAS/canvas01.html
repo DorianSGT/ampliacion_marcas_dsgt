@@ -13,13 +13,28 @@
             margin: 0 auto;
 
         }
+
+        #mibtn{
+            display: block;
+            margin: 20px auto;
+            font-size: 18px;
+            background-color: grey;
+            box-shadow: 0px 4px 10px black;
+            color: white;
+            padding: 5px;
+            transition: all 0.3s ease;
+        }
+        #mibtn:hover{
+            transform: translateY(-3px);
+        }
+
     </style>
     
 </head>
 <body>
     
     <canvas id="gameCanvas" width="800" height="400"></canvas>
-    
+    <button id="mibtn">¡DISPARA!</button>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
@@ -41,7 +56,7 @@
             imagen: new Image()
         };
 
-        
+        let bala = null;
         let existe_bala = false;
         
 
@@ -71,6 +86,27 @@
             ctx.beginPath();
             ctx.arc(bala.x, bala.y, 6, 0, 2 * Math.PI);
             ctx.fill();
+
+            // hay colisión con la diana 
+            
+            //es centro?
+            if ((bala.x >= diana.x+20 && bala.x <= diana.x +30) 
+            && (bala.y >= diana.y+20 && bala.y <= diana.y+30)) {
+                console.log(100);
+            }
+
+            else if ((bala.x >= diana.x && bala.x <= diana.x + diana.w) && (bala.y >= diana.y && bala.y <= diana.y + diana.h)){
+                console.log(50);
+
+                
+
+            }
+
+            // si nos salimos del campo que no haya bala
+            if ((existe_bala) && (bala.x > canvas.width))
+                {
+                    existe_bala=false;
+                } 
                 
 
             }
@@ -107,6 +143,20 @@
 
         );
 
+        //BOTON
+        
+        document.getElementById('mibtn').addEventListener('click', () => {
+            if (!existe_bala) {
+
+                existe_bala = true;
+                bala = {
+                    x: p1.x + p1.w,
+                    y: p1.y,
+                    velocidad: 7
+                }
+            } 
+        });
+
         function bucleJuego() {
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -119,6 +169,7 @@
         }
 
         bucleJuego();
+
 
 
     </script>
