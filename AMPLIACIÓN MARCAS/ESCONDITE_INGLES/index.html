@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>El Escondite Inglés <span style="color: #ff4757;">Futurista</span></h1>
+    
+    <div class="tablero" id="tablero">
+        <div class="jugador" id="jugador1">
+            <h2>Jugador 1</h2>
+            <p>Posición: <span>1/10</span> <span class="corazon">❤️</span></p>
+            <div class="camino">
+                <div class="casilla" style="top: 5px;">10</div>
+                <div class="casilla" style="top: 35px;">9</div>
+                <div class="casilla" style="top: 65px;">8</div>
+                <div class="casilla" style="top: 95px;">7</div>
+                <div class="casilla" style="top: 125px;">6</div>
+                <div class="casilla" style="top: 155px;">5</div>
+                <div class="casilla" style="top: 185px;">4</div>
+                <div class="casilla" style="top: 215px;">3</div>
+                <div class="casilla" style="top: 245px;">2</div>
+                <div class="casilla" style="top: 275px;">1</div>
+                <div class="ficha" style="top: 275px; background: radial-gradient(#3b97ff, #0b59b1);"></div>
+            </div>
+            <div class="botones-accion">
+                <button onclick="seleccionarAccion(0, 'andar')">ANDAR</button>
+                <button onclick="seleccionarAccion(0, 'pararse')">PARARSE</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mensajes" id="mensajes">
+        <p>¡Bienvenidos al juego! Selecciona si cada jugador quiere ANDAR o PARARSE</p>
+    </div>
+    
+    <button id="botonSiguiente" class="boton-siguiente" style="display: none;">Siguiente Turno</button>
+    <button id="botonReiniciar" class="boton-siguiente">Reiniciar Juego</button>
+    
+
+    <script>
+        var numeroCasillas = 10;
+        var numeroJugadores = 3;
+        var jugadores = [];
+        var bolsa = [];
+        var dadosNegrosAcumulados = [];
+        var turnoActual = 1;
+        var juegoTerminado = false;
+
+    </script>
+</body>
+</html>
