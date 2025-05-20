@@ -1,54 +1,371 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <title>Escondite Inglés</title>
+  <style>
+      body {
+          font-family: Arial, sans-serif;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+          margin: 0;
+          background-color: #f0f0f0;
+      }
+      .juego {
+          background-color: white;
+          border-radius: 10px;
+          box-shadow: 0 0 10px rgba(0,0,0,0.1);
+          padding: 20px;
+          text-align: center;
+      }
+      .tablero {
+          display: flex;
+          height: 400px;
+          border: 2px solid #333;
+          margin-bottom: 20px;
+      }
+      .columna-casillas {
+          width: 50px;
+          display: flex;
+          flex-direction: column-reverse;
+          background-color: #f0f0f0;
+          border-right: 1px solid #ccc;
+      }
+      .casilla {
+          flex: 1;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          border-bottom: 1px solid #eee;
+      }
+      .area-juego {
+          flex: 1;
+          position: relative;
+          background-color: #f9f9f9;
+      }
+      .jugador {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          position: absolute;
+          bottom: 0;
+          transition: bottom 0.3s ease;
+      }
+      .jugador.corazon::after {
+          content: '❤️';
+          position: absolute;
+          top: -10px;
+          right: -10px;
+          font-size: 20px;
+      }
+      .controles {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 10px;
+      }
+      .estado-juego {
+          margin: 10px 0;
+          font-weight: bold;
+          min-height: 30px;
+      }
+      .boton-seleccionado {
+          background-color: #4CAF50;
+          color: white;
+      }
+      .marcador {
+          display: flex;
+          justify-content: space-around;
+          margin-bottom: 10px;
+      }
+      .boton-dados {
+          margin-top: 10px;
+          padding: 10px;
+          background-color: #007bff;
+          color: white;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+      }
+      .boton-dados:disabled {
+          background-color: #cccccc;
+          cursor: not-allowed;
+      }
+  </style>
 </head>
 <body>
-    <h1>El Escondite Inglés <span style="color: #ff4757;">Futurista</span></h1>
-    
-    <div class="tablero" id="tablero">
-        <div class="jugador" id="jugador1">
-            <h2>Jugador 1</h2>
-            <p>Posición: <span>1/10</span> <span class="corazon">❤️</span></p>
-            <div class="camino">
-                <div class="casilla" style="top: 5px;">10</div>
-                <div class="casilla" style="top: 35px;">9</div>
-                <div class="casilla" style="top: 65px;">8</div>
-                <div class="casilla" style="top: 95px;">7</div>
-                <div class="casilla" style="top: 125px;">6</div>
-                <div class="casilla" style="top: 155px;">5</div>
-                <div class="casilla" style="top: 185px;">4</div>
-                <div class="casilla" style="top: 215px;">3</div>
-                <div class="casilla" style="top: 245px;">2</div>
-                <div class="casilla" style="top: 275px;">1</div>
-                <div class="ficha" style="top: 275px; background: radial-gradient(#3b97ff, #0b59b1);"></div>
-            </div>
-            <div class="botones-accion">
-                <button onclick="seleccionarAccion(0, 'andar')">ANDAR</button>
-                <button onclick="seleccionarAccion(0, 'pararse')">PARARSE</button>
-            </div>
-        </div>
-    </div>
-    
-    <div class="mensajes" id="mensajes">
-        <p>¡Bienvenidos al juego! Selecciona si cada jugador quiere ANDAR o PARARSE</p>
-    </div>
-    
-    <button id="botonSiguiente" class="boton-siguiente" style="display: none;">Siguiente Turno</button>
-    <button id="botonReiniciar" class="boton-siguiente">Reiniciar Juego</button>
-    
+  <div class="juego">
+      <h1>Escondite Inglés</h1>
+      <div class="marcador" id="marcador"></div>
+      <div class="tablero">
+          <div id="columna-casillas" class="columna-casillas"></div>
+          <div id="area-juego" class="area-juego"></div>
+      </div>
+      <div id="controles" class="controles"></div>
+      <div id="estado-juego" class="estado-juego"></div>
+      <button id="boton-tirar-dados" class="boton-dados" onclick="sacarDado()" disabled>Tirar Dados</button>
+      <button onclick="reiniciarJuego()">Reiniciar Juego</button>
+  </div>
 
-    <script>
-        var numeroCasillas = 10;
-        var numeroJugadores = 3;
-        var jugadores = [];
-        var bolsa = [];
-        var dadosNegrosAcumulados = [];
-        var turnoActual = 1;
-        var juegoTerminado = false;
+  <script>
 
-    </script>
+      const TOTAL_CASILLAS = 10;
+      const COLORES_JUGADORES = ['#FF6B6B', '#4ECDC4', '#45B7D1'];
+      const DADOS_NEGROS = [
+          { caras: [1,1,1,1,2,2] },
+          { caras: [1,1,1,1,0,0] },
+          { caras: [1,1,0,0,0,0] }
+      ];
+      const DADO_ROJO = { caras: [1,1,1,1,1,0] };
+
+      // Estado de los jugadores
+      let jugadores = [];
+      let dadosEnBolsa = [];
+      let juegoIniciado = false;
+      let puntuaciones = [0, 0, 0];
+
+      // Inicializar el juego
+      function inicializarJuego() {
+          // Crear jugadores
+          jugadores = COLORES_JUGADORES.map((color, index) => ({
+              id: index,
+              color: color,
+              estado: null,
+              tieneCorazon: false,
+              posicion: 1,
+              dadosNegrosLanzados: []
+          }));
+
+          // Reiniciar dados en bolsa
+          dadosEnBolsa = [...DADOS_NEGROS, DADO_ROJO];
+          juegoIniciado = false;
+
+          // Renderizar tablero
+          renderizarTablero();
+          renderizarControles();
+          renderizarMarcador();
+          limpiarMensaje();
+
+          // Deshabilitar botón de dados
+          document.getElementById('boton-tirar-dados').disabled = true;
+      }
+
+      // Renderizar marcador de puntuaciones
+      function renderizarMarcador() {
+          const marcador = document.getElementById('marcador');
+          marcador.innerHTML = jugadores.map((jugador, index) => 
+              `<div style="color:${jugador.color}">Jugador ${index + 1}: ${puntuaciones[index]}</div>`
+          ).join('');
+      }
+
+      // Renderizar tablero de casillas
+      function renderizarTablero() {
+          const columnaCasillas = document.getElementById('columna-casillas');
+          const areaJuego = document.getElementById('area-juego');
+          
+          // Limpiar tableros
+          columnaCasillas.innerHTML = '';
+          areaJuego.innerHTML = '';
+
+          // Crear casillas
+          for (let i = 1; i <= TOTAL_CASILLAS; i++) {
+              const casilla = document.createElement('div');
+              casilla.classList.add('casilla');
+              casilla.textContent = i;
+              columnaCasillas.appendChild(casilla);
+          }
+
+          // Crear jugadores
+          jugadores.forEach((jugador, index) => {
+              const elementoJugador = document.createElement('div');
+              elementoJugador.classList.add('jugador');
+              elementoJugador.style.backgroundColor = jugador.color;
+              elementoJugador.style.left = `${index * 60 + 10}px`;
+              elementoJugador.style.bottom = '0px';
+              
+              areaJuego.appendChild(elementoJugador);
+          });
+      }
+
+      // Renderizar controles de jugadores
+      function renderizarControles() {
+          const controles = document.getElementById('controles');
+          controles.innerHTML = '';
+
+          jugadores.forEach((jugador, index) => {
+              const botonAndar = document.createElement('button');
+              botonAndar.textContent = `Andar (${index + 1})`;
+              botonAndar.onclick = () => seleccionarAccion(index, 'andando', botonAndar);
+
+              const botonParar = document.createElement('button');
+              botonParar.textContent = `Parar (${index + 1})`;
+              botonParar.onclick = () => seleccionarAccion(index, 'parado', botonParar);
+
+              controles.appendChild(botonAndar);
+              controles.appendChild(botonParar);
+          });
+      }
+
+      // Seleccionar acción de jugador
+      function seleccionarAccion(indexJugador, estado, botonSeleccionado) {
+          // Si el juego ya terminó, no hacer nada
+          if (!jugadores[indexJugador]) return;
+
+          // Desmarcar otros botones del mismo jugador
+          const botonesJugador = botonSeleccionado.parentElement.querySelectorAll('button');
+          botonesJugador.forEach(boton => {
+              if (boton.parentNode.children[0] === boton || boton.parentNode.children[1] === boton) {
+                  boton.classList.remove('boton-seleccionado');
+              }
+          });
+          
+          // Marcar botón seleccionado
+          botonSeleccionado.classList.add('boton-seleccionado');
+
+          // Actualizar estado del jugador
+          jugadores[indexJugador].estado = estado;
+
+          // Verificar si todos los jugadores han seleccionado estado
+          const todosSeleccionaron = jugadores.every(j => j.estado !== null);
+          
+          if (todosSeleccionaron && !juegoIniciado) {
+              juegoIniciado = true;
+              mostrarMensaje('Todos los jugadores han elegido. Puede tirar los dados.');
+              document.getElementById('boton-tirar-dados').disabled = false;
+          }
+      }
+
+      // Sacar dado de la bolsa
+      function sacarDado() {
+          // Deshabilitar botón de dados
+          document.getElementById('boton-tirar-dados').disabled = true;
+
+          // Reponer bolsa si está vacía
+          if (dadosEnBolsa.length === 0) {
+              dadosEnBolsa = [...DADOS_NEGROS, DADO_ROJO];
+          }
+
+          // Seleccionar dado al azar
+          const indexDado = Math.floor(Math.random() * dadosEnBolsa.length);
+          const dadoSacado = dadosEnBolsa.splice(indexDado, 1)[0];
+          
+          procesarTurno(dadoSacado);
+      }
+
+      // Procesar turno
+      function procesarTurno(dadoSacado) {
+          jugadores.forEach(jugador => {
+              if (dadoSacado === DADO_ROJO) {
+                  procesarDadoRojo(jugador);
+              } else {
+                  procesarDadoNegro(jugador, dadoSacado);
+              }
+              
+              // Actualizar posición visual
+              actualizarPosicionJugador(jugador);
+          });
+
+          verificarGanador();
+          resetearEstados();
+      }
+
+      // Procesar dado rojo
+      function procesarDadoRojo(jugador) {
+          if (jugador.estado === 'parado') {
+              // Si está parado y no tiene corazón, le damos un corazón
+              if (!jugador.tieneCorazon) {
+                  jugador.tieneCorazon = true;
+                  mostrarMensaje(`Jugador ${jugador.id + 1} recibe corazón`);
+              }
+              // Si tiene corazón, puede avanzar
+              if (jugador.tieneCorazon) {
+                  jugador.posicion = Math.min(TOTAL_CASILLAS, jugador.posicion + 1);
+                  mostrarMensaje(`Jugador ${jugador.id + 1} avanza con el corazón`);
+              }
+          }
+      }
+
+      // Procesar dado negro
+      function procesarDadoNegro(jugador, dadoNegro) {
+          if (jugador.estado === 'andando' && !jugador.tieneCorazon) {
+              const valorDado = dadoNegro.caras[Math.floor(Math.random() * dadoNegro.caras.length)];
+              jugador.dadosNegrosLanzados.push(valorDado);
+              
+              const sumaMovimiento = jugador.dadosNegrosLanzados.reduce((a, b) => a + b, 0);
+              jugador.posicion = Math.min(TOTAL_CASILLAS, jugador.posicion + sumaMovimiento);
+              
+              mostrarMensaje(`Jugador ${jugador.id + 1} se mueve ${sumaMovimiento} casillas`);
+          }
+      }
+
+      // Actualizar posición visual del jugador
+      function actualizarPosicionJugador(jugador) {
+          const areaJuego = document.getElementById('area-juego');
+          const elementoJugador = areaJuego.children[jugador.id];
+          
+          // Actualizar posición
+          elementoJugador.style.bottom = `${(jugador.posicion - 1) * 40}px`;
+          
+          // Actualizar corazón
+          if (jugador.tieneCorazon) {
+              elementoJugador.classList.add('corazon');
+          } else {
+              elementoJugador.classList.remove('corazon');
+          }
+      }
+
+      // Verificar si hay ganador
+      function verificarGanador() {
+          const ganadores = jugadores.filter(j => j.posicion >= TOTAL_CASILLAS);
+          
+          if (ganadores.length > 0) {
+              ganadores.forEach(ganador => {
+                  puntuaciones[ganador.id]++;
+              });
+              
+              const nombresGanadores = ganadores.map(g => `Jugador ${g.id + 1}`).join(', ');
+              mostrarMensaje(`¡Ganadores de la ronda: ${nombresGanadores}!`);
+              
+              // Reiniciar juego para la siguiente ronda
+              setTimeout(inicializarJuego, 2000);
+          } else {
+              // Si no hay ganadores, habilitar el botón de dados para el próximo turno
+              document.getElementById('boton-tirar-dados').disabled = false;
+          }
+      }
+
+      // Resetear estados de los jugadores
+      function resetearEstados() {
+          if (!jugadores.length) return;
+          
+          jugadores.forEach(jugador => {
+              jugador.estado = null;
+          });
+          renderizarControles();
+      }
+
+      // Reiniciar juego
+      function reiniciarJuego() {
+          puntuaciones = [0, 0, 0];
+          inicializarJuego();
+      }
+
+      // Mostrar mensaje de estado
+      function mostrarMensaje(mensaje) {
+          const estadoJuego = document.getElementById('estado-juego');
+          estadoJuego.textContent = mensaje;
+      }
+
+      // Limpiar mensaje
+      function limpiarMensaje() {
+          const estadoJuego = document.getElementById('estado-juego');
+          estadoJuego.textContent = '';
+      }
+
+      // Iniciar juego al cargar
+      window.onload = inicializarJuego;
+  </script>
 </body>
 </html>
